@@ -121,6 +121,10 @@ timeline_schema = {
 }
 
 def analyze_document(text: str, persona: Optional[str] = None, jurisdiction: str = "US - General", language: str = "English") -> str:
+    if os.environ.get("DEMO_MODE", "false").lower() == "true":
+        from services.mock_demo import get_demo_analysis
+        return get_demo_analysis(persona)
+        
     prompt = f"Analyze the following document. First, if the document is NOT a legal contract, agreement, policy, or legal document, immediately return doc_type as 'NON_LEGAL_DOCUMENT' and leave other fields empty.\n"
     prompt += f"Extract its type, a summary, key clauses with risk levels, and a jargon glossary.\n"
     prompt += f"Limit risk clause explanations to 2 sentences maximum. Do not extract low-priority clauses. Optimize for extreme JSON generation speed.\n"
@@ -133,6 +137,10 @@ def analyze_document(text: str, persona: Optional[str] = None, jurisdiction: str
     return _call_gemini_rest(prompt, "AnalysisResult", analysis_schema)
 
 def chat_rag(text: str, question: str, jurisdiction: str = "US - General", language: str = "English") -> str:
+    if os.environ.get("DEMO_MODE", "false").lower() == "true":
+        from services.mock_demo import get_demo_chat
+        return get_demo_chat(question)
+        
     prompt = f"If the user asks for advice on an active personal legal situation (e.g. 'what should I do about my court case', 'how do I sue'), reply exactly with: 'Please consult a qualified professional. I cannot provide advice on active personal legal situations.'\n"
     prompt += f"Otherwise, based ONLY on the following document, answer the question. If uncertain, state 'uncertain' and set confidence LOW.\n"
     prompt += f"Note that laws vary by jurisdiction. Answer with {jurisdiction} in mind.\n"
@@ -141,10 +149,18 @@ def chat_rag(text: str, question: str, jurisdiction: str = "US - General", langu
     return _call_gemini_rest(prompt, "ChatResponse", chat_schema)
 
 def extract_timeline_events(text: str) -> str:
+    if os.environ.get("DEMO_MODE", "false").lower() == "true":
+        from services.mock_demo import get_demo_timeline
+        return get_demo_timeline()
+        
     prompt = f"Extract date-bound obligations (notice periods, renewal windows, payment due dates) from the document.\n\nDocument:\n{text[:4000]}"
     return _call_gemini_rest(prompt, "TimelineResult", timeline_schema)
 
 def simulate_scenario(text: str, scenario: str) -> str:
+    if os.environ.get("DEMO_MODE", "false").lower() == "true":
+        from services.mock_demo import get_demo_scenario
+        return get_demo_scenario(scenario)
+        
     prompt = f"Based on the document, explain what happens in the following scenario: {scenario}\nKeep it in plain language. Start your response with: 'Illustrative scenario, not legal advice.'\n\nDocument:\n{text[:4000]}"
     return _call_gemini_rest(prompt, "", None)
 
@@ -167,5 +183,9 @@ diff_schema = {
 }
 
 def compare_documents(text1: str, text2: str) -> str:
+    if os.environ.get("DEMO_MODE", "false").lower() == "true":
+        from services.mock_demo import get_demo_diff
+        return get_demo_diff()
+        
     prompt = f"Compare Document 1 (Original) and Document 2 (New). Identify the key insertions, deletions, and modifications. Explain each change in plain language and what it means for the parties.\n\nDocument 1 (Original):\n{text1[:4000]}\n\nDocument 2 (New):\n{text2[:4000]}"
     return _call_gemini_rest(prompt, "DiffResult", diff_schema)
