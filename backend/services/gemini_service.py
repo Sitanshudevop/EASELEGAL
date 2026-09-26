@@ -24,23 +24,31 @@ def _call_gemini_rest(prompt: str, schema_name: str, schema_dict: dict) -> str:
     if not schema_dict:
         payload["generationConfig"] = {"responseMimeType": "text/plain"}
         
-    try:
-        response = requests.post(url, json=payload, headers={'Content-Type': 'application/json'}, timeout=60)
-        response.raise_for_status()
-        data = response.json()
-        
-        candidates = data.get("candidates", [])
-        if not candidates:
-            return "{}"
+    for attempt in range(2):
+        try:
+            response = requests.post(url, json=payload, headers={'Content-Type': 'application/json'}, timeout=300)
+            response.raise_for_status()
+            data = response.json()
             
-        text = candidates[0].get("content", {}).get("parts", [])
-        if not text:
-            return "{}"
+            candidates = data.get("candidates", [])
+            if not candidates:
+                return "{}"
+                
+            text = candidates[0].get("content", {}).get("parts", [])
+            if not text:
+                return "{}"
+                
+            return text[0].get("text", "{}")
+        except requests.exceptions.Timeout as e:
+            print(f"Gemini API Timeout on attempt {attempt + 1}: {e}")
+            if attempt == 1:
+                from fastapi import HTTPException
+                raise HTTPException(status_code=504, detail="Upstream LLM Timeout after retries")
+        except Exception as e:
+            print(f"Gemini API Error: {e}")
+            raise
             
-        return text[0].get("text", "{}")
-    except Exception as e:
-        print(f"Gemini API Error: {e}")
-        raise
+    return "{}"
 
 # Schemas
 analysis_schema = {
