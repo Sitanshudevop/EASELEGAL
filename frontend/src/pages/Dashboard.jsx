@@ -11,8 +11,8 @@ export default function Dashboard({ jurisdiction, language }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState(null);
   const [sessionId, setSessionId] = useState(null);
-  const [activeTab, setActiveTab] = useState('viewer'); // viewer, timeline, diff, chat
-  const [persona, setPersona] = useState('tenant');
+  const [activeTab, setActiveTab] = useState('viewer`); // viewer, timeline, diff, chat
+  const [persona, setPersona] = useState('tenant`);
   const [chatQuestion, setChatQuestion] = useState("");
   const [chatResponse, setChatResponse] = useState(null);
   const [quickScanText, setQuickScanText] = useState("");
@@ -22,7 +22,7 @@ export default function Dashboard({ jurisdiction, language }) {
   const location = useLocation();
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('legalHistory') || '[]');
+    const saved = JSON.parse(localStorage.getItem('legalHistory`) || '[]`);
     setRecentHistory(saved.reverse().slice(0, 4));
   }, []);
 
@@ -33,7 +33,7 @@ export default function Dashboard({ jurisdiction, language }) {
       setFile({ name: location.state.filename || 'Historical Document' });
       
       setAnalyzing(true);
-      axios.post('http://localhost:8000/api/analyze', {
+      axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/analyze`, {
         session_id: sid,
         persona: persona,
         jurisdiction: jurisdiction,
@@ -59,7 +59,7 @@ export default function Dashboard({ jurisdiction, language }) {
     formData.append('file', uploadedFile);
     
     try {
-      const uploadRes = await axios.post('http://localhost:8000/api/upload', formData, {
+      const uploadRes = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -67,7 +67,7 @@ export default function Dashboard({ jurisdiction, language }) {
       const sid = uploadRes.data.session_id;
       setSessionId(sid);
       
-      const analyzeRes = await axios.post('http://localhost:8000/api/analyze', {
+      const analyzeRes = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/analyze`, {
         session_id: sid,
         persona: persona,
         jurisdiction: jurisdiction,
@@ -75,7 +75,7 @@ export default function Dashboard({ jurisdiction, language }) {
       });
       setAnalysisData(analyzeRes.data);
       
-      const history = JSON.parse(localStorage.getItem('legalHistory') || '[]');
+      const history = JSON.parse(localStorage.getItem('legalHistory`) || '[]`);
       history.push({ filename: uploadedFile.name, date: new Date().toISOString(), session_id: sid });
       localStorage.setItem('legalHistory', JSON.stringify(history));
     } catch (err) {
@@ -90,12 +90,12 @@ export default function Dashboard({ jurisdiction, language }) {
     if (!quickScanText) return;
     setAnalyzing(true);
     try {
-      const uploadRes = await axios.post('http://localhost:8000/api/upload-text', { text: quickScanText });
+      const uploadRes = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/upload-text`, { text: quickScanText });
       const sid = uploadRes.data.session_id;
       setSessionId(sid);
       setFile({ name: 'Quick Scan Snippet' });
       
-      const analyzeRes = await axios.post('http://localhost:8000/api/analyze', {
+      const analyzeRes = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/analyze`, {
         session_id: sid,
         persona: persona,
         jurisdiction: jurisdiction,
@@ -131,7 +131,7 @@ export default function Dashboard({ jurisdiction, language }) {
   const handleChat = async () => {
     if (!chatQuestion || !sessionId) return;
     try {
-      const res = await axios.post('http://localhost:8000/api/chat', {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/chat`, {
         session_id: sessionId,
         question: chatQuestion,
         jurisdiction: jurisdiction,
@@ -150,10 +150,10 @@ export default function Dashboard({ jurisdiction, language }) {
     const formData = new FormData();
     formData.append('file', uploadedFile);
     try {
-      const uploadRes = await axios.post('http://localhost:8000/api/upload', formData);
+      const uploadRes = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/upload`, formData);
       const sid2 = uploadRes.data.session_id;
       
-      const diffRes = await axios.post('http://localhost:8000/api/diff', {
+      const diffRes = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/diff`, {
         session_id_1: sessionId,
         session_id_2: sid2
       });
@@ -168,10 +168,10 @@ export default function Dashboard({ jurisdiction, language }) {
 
   const handleDownloadDossier = async () => {
       try {
-        const res = await axios.post('http://localhost:8000/api/generate-dossier', { session_id: sessionId });
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/generate-dossier`, { session_id: sessionId });
         const blob = new Blob([res.data.dossier_markdown], { type: 'text/markdown' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement('a`);
         a.href = url;
         a.download = 'dossier.md';
         a.click();
@@ -183,10 +183,10 @@ export default function Dashboard({ jurisdiction, language }) {
   const handleDeleteSession = async () => {
     if (!sessionId) return;
     try {
-      if (!sessionId.startsWith('mock-')) {
-        await axios.delete(`http://localhost:8000/api/session/${sessionId}`);
+      if (!sessionId.startsWith('mock-`)) {
+        await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/session/${sessionId}`);
       }
-      const history = JSON.parse(localStorage.getItem('legalHistory') || '[]');
+      const history = JSON.parse(localStorage.getItem('legalHistory`) || '[]`);
       const newHistory = history.filter(h => h.session_id !== sessionId);
       localStorage.setItem('legalHistory', JSON.stringify(newHistory));
       
@@ -350,10 +350,10 @@ export default function Dashboard({ jurisdiction, language }) {
             
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
               <div className="flex items-center bg-slate-100 dark:bg-slate-700 p-1 rounded-lg w-full md:w-auto overflow-x-auto overflow-y-hidden whitespace-nowrap">
-                <button aria-label="View split pane" onClick={() => setActiveTab('viewer')} className={tabClasses('viewer')}>Viewer</button>
-                <button aria-label="View timeline" onClick={() => setActiveTab('timeline')} className={tabClasses('timeline')}>Timeline</button>
-                <button aria-label="View chat" onClick={() => setActiveTab('chat')} className={tabClasses('chat')}>RAG Chat</button>
-                <button aria-label="View comparison" onClick={() => setActiveTab('diff')} className={tabClasses('diff')}>Compare</button>
+                <button aria-label="View split pane" onClick={() => setActiveTab('viewer`)} className={tabClasses('viewer`)}>Viewer</button>
+                <button aria-label="View timeline" onClick={() => setActiveTab('timeline`)} className={tabClasses('timeline`)}>Timeline</button>
+                <button aria-label="View chat" onClick={() => setActiveTab('chat`)} className={tabClasses('chat`)}>RAG Chat</button>
+                <button aria-label="View comparison" onClick={() => setActiveTab('diff`)} className={tabClasses('diff`)}>Compare</button>
               </div>
               <div className="hidden md:block h-6 w-px bg-slate-200 dark:bg-slate-600"></div>
               <div className="flex items-center gap-2">

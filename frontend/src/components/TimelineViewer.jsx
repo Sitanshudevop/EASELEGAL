@@ -9,7 +9,7 @@ export default function TimelineViewer({ sessionId }) {
   useEffect(() => {
     async function fetchTimeline() {
       try {
-        const res = await axios.post('http://localhost:8000/api/extract-timeline', { session_id: sessionId });
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/extract-timeline`, { session_id: sessionId });
         setData(res.data);
       } catch (err) {
         console.error(err);

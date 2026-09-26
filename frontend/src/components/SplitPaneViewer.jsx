@@ -14,7 +14,7 @@ export default function SplitPaneViewer({ analysis, sessionId, jurisdiction, lan
       if (!sessionId.startsWith('mock-')) {
         const opposing = currentPersona === 'tenant' ? 'landlord' : (currentPersona === 'employee' ? 'employer' : 'counterparty');
         setIsFetchingDual(true);
-        axios.post('http://localhost:8000/api/analyze', {
+        axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/analyze`, {
           session_id: sessionId,
           persona: opposing,
           jurisdiction: jurisdiction,
