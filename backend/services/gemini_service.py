@@ -18,7 +18,7 @@ def _call_gemini_rest(prompt: str, schema_name: str, schema_dict: dict) -> str:
         "generationConfig": {
             "responseMimeType": "application/json",
             "responseSchema": schema_dict,
-            "temperature": 0.1,
+            "temperature": 0.7,
             "maxOutputTokens": 2048
         }
     }
@@ -26,7 +26,7 @@ def _call_gemini_rest(prompt: str, schema_name: str, schema_dict: dict) -> str:
     if not schema_dict:
         payload["generationConfig"] = {
             "responseMimeType": "text/plain",
-            "temperature": 0.1,
+            "temperature": 0.7,
             "maxOutputTokens": 2048
         }
         
