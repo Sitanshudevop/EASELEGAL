@@ -58,11 +58,15 @@ export default function Dashboard({ jurisdiction, language }) {
     const formData = new FormData();
     formData.append('file', uploadedFile);
     
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
+    
     try {
       const uploadRes = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        }
+        },
+        signal: controller.signal
       });
       const sid = uploadRes.data.session_id;
       setSessionId(sid);
@@ -72,16 +76,22 @@ export default function Dashboard({ jurisdiction, language }) {
         persona: persona,
         jurisdiction: jurisdiction,
         language: language
-      });
+      }, { signal: controller.signal });
       setAnalysisData(analyzeRes.data);
       
       const history = JSON.parse(localStorage.getItem('legalHistory') || '[]');
       history.push({ filename: uploadedFile.name, date: new Date().toISOString(), session_id: sid });
       localStorage.setItem('legalHistory', JSON.stringify(history));
+      clearTimeout(timeoutId);
     } catch (err) {
       console.error("Upload Failure Details:", err);
-      alert(err.message || "Error analyzing document");
+      if (axios.isCancel(err) || err.name === 'CanceledError') {
+        alert("Analysis timed out. Try a shorter document.");
+      } else {
+        alert(err.message || "Error analyzing document");
+      }
     } finally {
+      clearTimeout(timeoutId);
       setAnalyzing(false);
     }
   };

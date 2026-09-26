@@ -11,18 +11,24 @@ def _call_gemini_rest(prompt: str, schema_name: str, schema_dict: dict) -> str:
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
     if not api_key:
         return "{}"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={api_key.strip()}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key.strip()}"
     
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "responseMimeType": "application/json",
-            "responseSchema": schema_dict
+            "responseSchema": schema_dict,
+            "temperature": 0.1,
+            "maxOutputTokens": 2048
         }
     }
     
     if not schema_dict:
-        payload["generationConfig"] = {"responseMimeType": "text/plain"}
+        payload["generationConfig"] = {
+            "responseMimeType": "text/plain",
+            "temperature": 0.1,
+            "maxOutputTokens": 2048
+        }
         
     for attempt in range(2):
         try:
@@ -116,6 +122,7 @@ timeline_schema = {
 def analyze_document(text: str, persona: Optional[str] = None, jurisdiction: str = "US - General", language: str = "English") -> str:
     prompt = f"Analyze the following document. First, if the document is NOT a legal contract, agreement, policy, or legal document, immediately return doc_type as 'NON_LEGAL_DOCUMENT' and leave other fields empty.\n"
     prompt += f"Extract its type, a summary, key clauses with risk levels, and a jargon glossary.\n"
+    prompt += f"Limit risk clause explanations to 2 sentences maximum. Do not extract low-priority clauses. Optimize for extreme JSON generation speed.\n"
     prompt += f"For each flagged clause, compare it against a 'typical/fair' baseline for this document type (e.g. rental agreement, NDA, etc.). Use the 'deviation_note' field to explain if it is unusually one-sided (e.g. 'most agreements of this type cap X at Y; this one has no cap').\n"
     if persona:
         prompt += f"Analyze this specifically from the perspective of a {persona}. Adjust risk levels and explanations accordingly.\n"
