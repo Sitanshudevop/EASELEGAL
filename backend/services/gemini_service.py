@@ -11,7 +11,7 @@ def _call_gemini_rest(prompt: str, schema_name: str, schema_dict: dict) -> str:
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
     if not api_key:
         return "{}"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key.strip()}" # Fix explicitly verified
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key.strip()}" # Fix explicitly verified # trigger deployment
     
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
