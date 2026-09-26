@@ -20,6 +20,8 @@ def analyze_doc(request: AnalyzeRequest):
     
     try:
         result_str = analyze_document(text, request.persona, request.jurisdiction, request.language)
+        print("RAW GEMINI RESPONSE:")
+        print(result_str)
         
         # Strip potential markdown formatting (```json ... ```)
         result_str = result_str.strip()
