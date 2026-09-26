@@ -1,0 +1,1 @@
+This is a dummy rental agreement contract. The tenant shall pay  rent every month. The landlord is John Doe. This agreement is governed by the laws of California. Termination requires 30 days notice.

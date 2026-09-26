@@ -1,0 +1,11 @@
+fastapi==0.95.2
+uvicorn==0.28.0
+google-generativeai==0.4.1
+pydantic<2.0.0
+python-multipart==0.0.9
+python-dotenv==1.0.1
+pypdf
+python-docx
+fpdf2
+httpx
+pymupdf
